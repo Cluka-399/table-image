@@ -54,3 +54,15 @@ clawhub install table-image-generator
 ## License
 
 MIT
+
+## RTL Support (v1.1.0)
+
+Auto-detects Hebrew, Arabic, and other RTL scripts:
+
+```bash
+node scripts/table.mjs \
+  --data '[{"שם":"דני","גיל":28,"עיר":"תל אביב"}]' \
+  --dark --output hebrew.png
+```
+
+Or force RTL manually with `--rtl` flag.
