@@ -1,6 +1,6 @@
 ---
-name: table-image
-version: 1.1.0
+name: table-image-generator
+version: 1.1.1
 description: Generate clean table images from data. Perfect for Discord/Telegram where ASCII tables look broken. Supports dark/light mode, custom styling, and auto-sizing. No Puppeteer required. Companion to chart-image skill.
 author: dannyshmueli
 provides:
