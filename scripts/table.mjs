@@ -20,6 +20,7 @@ function parseArgs(args) {
     stripe: true,
     dark: false,
     compact: false,
+    rtl: false,
   };
   
   for (let i = 0; i < args.length; i++) {
@@ -40,6 +41,7 @@ function parseArgs(args) {
       case '--stripe': opts.stripe = true; break;
       case '--align': opts.align = next.split(',').map(s => s.trim().toLowerCase()); i++; break;
       case '--compact': opts.compact = true; break;
+      case '--rtl': opts.rtl = true; break;
       case '--help':
         console.log(`
 table.mjs - Generate table images from JSON data
@@ -60,6 +62,7 @@ Options:
   --no-stripe     Disable alternating row colors
   --align         Column alignments: l,r,c (comma-separated)
   --compact       Reduce padding
+  --rtl           Force RTL layout (auto-detected for Hebrew/Arabic)
 `);
         process.exit(0);
     }
@@ -92,6 +95,24 @@ function isNumeric(val) {
   return !isNaN(parseFloat(cleaned)) && isFinite(cleaned);
 }
 
+// Detect if text contains RTL characters (Hebrew, Arabic, etc.)
+function containsRtl(text) {
+  return /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(String(text));
+}
+
+// Auto-detect RTL from data and column names
+function autoDetectRtl(data, columns) {
+  for (const row of data) {
+    for (const col of columns) {
+      if (containsRtl(row[col] ?? '')) return true;
+    }
+  }
+  for (const col of columns) {
+    if (containsRtl(col)) return true;
+  }
+  return false;
+}
+
 // Escape XML special characters
 function escapeXml(str) {
   return String(str)
@@ -109,8 +130,18 @@ function generateTableSvg(data, opts) {
   }
   
   // Determine columns
-  const columns = opts.columns || Object.keys(data[0]);
-  const headers = opts.headers || columns;
+  let columns = opts.columns || Object.keys(data[0]);
+  let headers = opts.headers || [...columns];
+  
+  // Auto-detect RTL if not explicitly set via --rtl flag
+  const isRtl = opts.rtl || autoDetectRtl(data, columns);
+  
+  // For RTL: reverse column order so the layout reads right-to-left
+  if (isRtl) {
+    columns = [...columns].reverse();
+    headers = [...headers].reverse();
+    if (opts.align) opts.align = [...opts.align].reverse();
+  }
   
   // Theme colors
   const theme = opts.dark ? {
@@ -162,9 +193,11 @@ function generateTableSvg(data, opts) {
       if (a === 'r' || a === 'right') return 'end';
       if (a === 'c' || a === 'center') return 'middle';
     }
-    // Auto-detect: right-align numbers
+    // Auto-detect alignment: right-align numbers, and right-align text in RTL mode
     const hasNumbers = data.some(row => isNumeric(row[col]));
-    return hasNumbers ? 'end' : 'start';
+    if (hasNumbers) return 'end';
+    if (isRtl) return 'end';
+    return 'start';
   });
   
   // Calculate dimensions
