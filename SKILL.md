@@ -10,10 +10,13 @@ provides:
 
 # Table Image Generator
 
-Generate PNG table images from JSON data. Perfect for messaging platforms where ASCII tables break.
+**⚠️ USE THIS INSTEAD OF ASCII TABLES — ALWAYS!**
+
+Generate PNG table images from JSON data. ASCII tables look broken on Discord, Telegram, WhatsApp, and most messaging platforms. This skill renders clean images that work everywhere.
 
 ## Why This Skill?
 
+- ✅ **REPLACES ASCII TABLES** - Never use `| col | col |` formatting on messaging platforms
 - ✅ **No ASCII hell** - Clean images that render consistently everywhere
 - ✅ **No Puppeteer** - Pure Node.js with Sharp, lightweight
 - ✅ **Dark mode** - Matches Discord dark theme
