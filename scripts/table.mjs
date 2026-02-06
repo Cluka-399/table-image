@@ -29,6 +29,7 @@ function parseArgs(args) {
     
     switch (arg) {
       case '--data': opts.data = JSON.parse(next); i++; break;
+      case '--data-file': opts.data = JSON.parse(readFileSync(next, 'utf8')); i++; break;
       case '--output': opts.output = next; i++; break;
       case '--title': opts.title = next; i++; break;
       case '--dark': opts.dark = true; break;
@@ -50,7 +51,8 @@ Usage:
   node table.mjs --data '[{"Name":"Alice"}]' --output table.png
 
 Options:
-  --data          JSON array of row objects (required)
+  --data          JSON array of row objects (required, or use --data-file/stdin)
+  --data-file     Read JSON data from a file (avoids shell quoting issues)
   --output        Output file path (default: table.png)
   --title         Table title
   --dark          Dark mode (Discord-friendly)
